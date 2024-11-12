@@ -1,6 +1,10 @@
 package campaign
 
-import "time"
+import (
+	"time"
+
+	"github.com/google/uuid"
+)
 
 
 type Contact struct {
@@ -16,4 +20,29 @@ type Campaign struct {
 	Content   string `json:"content"`
 	Contacts  []Contact `json:"contacts"`
 	CreatedAt time.Time `json:"created_at"`
+}
+
+
+
+func NewCampaign(name string, content string, emails []string) *Campaign {
+
+	contacts := make([]Contact, len(emails))
+
+	for _, email := range emails {
+		contact := Contact{
+			ID:        uuid.New().String(),
+			Name:      "Name",
+			Email:     email,
+			CreatedAt: time.Now(),
+		}
+		contacts = append(contacts, contact)
+	}
+
+	return &Campaign{
+		ID:        uuid.New().String(),
+		Name:      name,
+		Content:   content,
+		Contacts:  contacts,
+		CreatedAt: time.Now(),
+	}
 }
