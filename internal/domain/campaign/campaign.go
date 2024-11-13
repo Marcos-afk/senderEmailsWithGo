@@ -1,6 +1,7 @@
 package campaign
 
 import (
+	"errors"
 	"strings"
 	"time"
 
@@ -16,15 +17,27 @@ type Contact struct {
 
 type Campaign struct {
 	ID        string    `json:"id"`
-	Name      string    `json:"name"`
+	Name      string    `json:"name" `
 	Content   string    `json:"content"`
 	Contacts  []Contact `json:"contacts"`
 	CreatedAt time.Time `json:"created_at"`
 }
 
-func NewCampaign(name string, content string, emails []string) *Campaign {
+func NewCampaign(name string, content string, emails []string) (*Campaign, error) {
 	guid := xid.New()
 	contacts := make([]Contact, 0, len(emails))
+
+	if name == "" {
+		return nil, errors.New("name is required")
+	}
+
+	if content == "" {
+		return nil, errors.New("content is required")
+	}
+
+	if len(emails) == 0 {
+		return nil, errors.New("contacts are required")
+	}
 
 	for _, email := range emails {
 		contact := Contact{
@@ -43,5 +56,5 @@ func NewCampaign(name string, content string, emails []string) *Campaign {
 		Content:   content,
 		Contacts:  contacts,
 		CreatedAt: time.Now(),
-	}
+	}, nil
 }
