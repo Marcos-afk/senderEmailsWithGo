@@ -1,7 +1,7 @@
 package campaign
 
 import (
-	"errors"
+	internalerrors "senderEmails/internal/internal-errors"
 	"strings"
 	"time"
 
@@ -9,35 +9,23 @@ import (
 )
 
 type Contact struct {
-	ID        string    `json:"id"`
-	Name      string    `json:"name"`
-	Email     string    `json:"email"`
-	CreatedAt time.Time `json:"created_at"`
+	ID        string    `json:"id" validate:"required"`
+	Name      string    `json:"name" validate:"required"`
+	Email     string    `json:"email" validate:"email"`
+	CreatedAt time.Time `json:"created_at" validate:"required"`
 }
 
 type Campaign struct {
-	ID        string    `json:"id"`
-	Name      string    `json:"name" `
-	Content   string    `json:"content"`
-	Contacts  []Contact `json:"contacts"`
-	CreatedAt time.Time `json:"created_at"`
+	ID        string    `json:"id" validate:"required"`
+	Name      string    `json:"name" validate:"min=5,max=100"`
+	Content   string    `json:"content" validate:"min=5,max=200"`
+	Contacts  []Contact `json:"contacts" validate:"min=1,dive"`
+	CreatedAt time.Time `json:"created_at" validate:"required"`
 }
 
 func NewCampaign(name string, content string, emails []string) (*Campaign, error) {
 	guid := xid.New()
 	contacts := make([]Contact, 0, len(emails))
-
-	if name == "" {
-		return nil, errors.New("name is required")
-	}
-
-	if content == "" {
-		return nil, errors.New("content is required")
-	}
-
-	if len(emails) == 0 {
-		return nil, errors.New("contacts are required")
-	}
 
 	for _, email := range emails {
 		contact := Contact{
@@ -50,11 +38,18 @@ func NewCampaign(name string, content string, emails []string) (*Campaign, error
 		contacts = append(contacts, contact)
 	}
 
-	return &Campaign{
+	campaign := &Campaign{
 		ID:        guid.String(),
 		Name:      name,
 		Content:   content,
 		Contacts:  contacts,
 		CreatedAt: time.Now(),
-	}, nil
+	}
+
+	validateStructError := internalerrors.ValidateStruct(campaign)
+	if validateStructError != nil {
+		return nil, validateStructError
+	}
+
+	return campaign, nil
 }
