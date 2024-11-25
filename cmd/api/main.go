@@ -1,31 +1,44 @@
 package main
 
 import (
+	"log"
 	"net/http"
+	"senderEmails/internal/domain/campaign"
+	"senderEmails/internal/endpoints"
+	"senderEmails/internal/infraestructure/database"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 )
 
+
 func main() {
 	routes := chi.NewRouter()
 
+	routes.Use(middleware.RequestID)
+	routes.Use(middleware.RealIP)
 	routes.Use(middleware.Logger)
+	routes.Use(middleware.Recoverer)
 
-	routes.Get("/", func(w http.ResponseWriter, r *http.Request) {
-		search := r.URL.Query().Get("search")
+	campaignService := campaign.Service{
+		Repository: &database.CampaignRepository{},
+	}
 
-		if search != "" {
-      w.Write([]byte(search))
-		}else {
-			w.Write([]byte("Hello, World!"))
-		}
+	handler := endpoints.Handler{
+		CampaignService: campaignService,
+	}
+
+	routes.Route("/api/v1", func(r chi.Router) {
+		r.Route("/campaigns", func(r chi.Router) {
+			r.Post("/", endpoints.HandlerError(handler.CampaignPost))
+			r.Get("/", endpoints.HandlerError(handler.CampaignsGet))
+		})
 	})
 
-	routes.Get("/{name}", func(w http.ResponseWriter, r *http.Request) {
-		name := chi.URLParam(r, "name")
-		w.Write([]byte(name))
-	})
+	port := ":5000"
+	log.Printf("🚀 Servidor iniciado na porta %s", port)
 
-	http.ListenAndServe(":5000", routes)
+	if err := http.ListenAndServe(port, routes); err != nil {
+		log.Fatalf("Erro ao iniciar o servidor: %v", err)
+	}
 }

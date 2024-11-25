@@ -30,6 +30,11 @@ func (r *RepositoryMock) Create(campaign *Campaign) (Campaign, error){
 	return args.Get(0).(Campaign), args.Error(1)
 }
 
+func (r *RepositoryMock) Get() ([]Campaign){
+	args := r.Called()
+	return args.Get(0).([]Campaign)
+}
+
 func Test_Create_Campaign(t *testing.T) {
 	assert := assert.New(t)
 
@@ -95,4 +100,18 @@ func Test_Create_Campaign_ValidateRepositoryCreate(t *testing.T) {
 	_, error := service.Create(createCampaign)
 
 	assert.Equal(internalerrors.ErrInternal.Error(), error.Error())
+}
+
+
+func Test_GetAll_Campaign(t *testing.T) {
+	assert := assert.New(t)
+
+	repositoryMock := new(RepositoryMock)
+	service.Repository = repositoryMock
+
+	repositoryMock.On("Get").Return([]Campaign{})
+
+	foundedCampaigns := service.Get()
+	
+	assert.NotNil(foundedCampaigns)
 }

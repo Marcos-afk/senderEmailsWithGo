@@ -26,3 +26,10 @@ func (s *Service) Create(createCampaign contracts.CreateCampaign) (*Campaign, er
 	return campaign, nil
 
 }
+
+
+func (s *Service) Get() []Campaign {
+	campaigns := s.Repository.Get()
+
+	return campaigns
+}
