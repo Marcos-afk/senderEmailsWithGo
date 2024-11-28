@@ -8,6 +8,14 @@ import (
 	"github.com/rs/xid"
 )
 
+
+const (
+	PendingStatus = "PENDING"
+	SentStatus    = "SENT"
+	FailedStatus  = "FAILED"
+)
+
+
 type Contact struct {
 	ID        string    `json:"id" validate:"required"`
 	Name      string    `json:"name" validate:"required"`
@@ -20,8 +28,11 @@ type Campaign struct {
 	Name      string    `json:"name" validate:"min=5,max=100"`
 	Content   string    `json:"content" validate:"min=5,max=200"`
 	Contacts  []Contact `json:"contacts" validate:"min=1,dive"`
+	Status 		string    `json:"status" validate:"required"`
 	CreatedAt time.Time `json:"created_at" validate:"required"`
 }
+
+
 
 func NewCampaign(name string, content string, emails []string) (*Campaign, error) {
 	guid := xid.New()
@@ -42,6 +53,7 @@ func NewCampaign(name string, content string, emails []string) (*Campaign, error
 		ID:        guid.String(),
 		Name:      name,
 		Content:   content,
+		Status: 	PendingStatus,
 		Contacts:  contacts,
 		CreatedAt: time.Now(),
 	}

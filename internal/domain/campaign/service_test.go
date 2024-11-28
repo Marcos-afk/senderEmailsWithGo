@@ -59,6 +59,11 @@ func Test_Create_Save_Campaign(t *testing.T) {
 			if campaign.Content != createCampaign.Content {
 				return false
 			}
+
+			if campaign.Status != PendingStatus {
+				return false
+			}
+
 			if len(campaign.Contacts) != len(createCampaign.Emails) {
 				return false
 			}
