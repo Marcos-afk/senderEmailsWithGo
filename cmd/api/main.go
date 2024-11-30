@@ -20,8 +20,11 @@ func main() {
 	routes.Use(middleware.Logger)
 	routes.Use(middleware.Recoverer)
 
+	db := database.NewConnectionToDB()
 	campaignService := campaign.Service{
-		Repository: &database.CampaignRepository{},
+		Repository: &database.CampaignRepository{
+			Db: db,
+		},
 	}
 
 	handler := endpoints.Handler{

@@ -3,30 +3,41 @@ package database
 import (
 	"errors"
 	"senderEmails/internal/domain/campaign"
+
+	"gorm.io/gorm"
 )
 
 type CampaignRepository struct{
-	campaigns []campaign.Campaign
+	Db *gorm.DB
 }
 
 
-func (c *CampaignRepository) Create(campaign *campaign.Campaign) (campaign.Campaign, error) {
-	c.campaigns = append(c.campaigns, *campaign)
+func (c *CampaignRepository) Create(campaignData *campaign.Campaign) (campaign.Campaign, error) {
+	tx := c.Db.Create(&campaignData)
+
+	if tx.Error != nil {
+		return campaign.Campaign{}, tx.Error
+	}
 	
-	return *campaign, nil
+	return *campaignData, nil
 }
 
 func (c *CampaignRepository) Get() []campaign.Campaign {
-	return c.campaigns
+	var campaigns []campaign.Campaign
+  
+	c.Db.Preload("Contacts").Find(&campaigns)
+
+	return campaigns
 }
 
 
 func (c *CampaignRepository) GetById(id string) (*campaign.Campaign, error) {
-	for _, campaign := range c.campaigns {
-		if campaign.ID == id {
-			return &campaign, nil
-		}
+	var foundCampaign campaign.Campaign
+
+	tx := c.Db.Where("id = ?", id).First(&foundCampaign)
+	if tx.Error != nil {
+		return &campaign.Campaign{}, errors.New("campanha não encontrada")
 	}
 
-	return &campaign.Campaign{}, errors.New("campanha não encontrada")
+	return &foundCampaign, nil
 }
