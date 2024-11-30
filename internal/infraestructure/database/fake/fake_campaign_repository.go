@@ -16,3 +16,13 @@ func (c *FakeCampaignRepository) Create(campaign *campaign.Campaign) (campaign.C
 func (c *FakeCampaignRepository) Get() []campaign.Campaign {
 	return c.campaigns
 }
+
+func (c *FakeCampaignRepository) GetById(id string) (*campaign.Campaign, error) {
+	for _, campaign := range c.campaigns {
+		if campaign.ID == id {
+			return &campaign, nil
+		}
+	}
+
+	return &campaign.Campaign{}, nil
+}

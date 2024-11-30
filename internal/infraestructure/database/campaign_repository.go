@@ -1,6 +1,9 @@
 package database
 
-import "senderEmails/internal/domain/campaign"
+import (
+	"errors"
+	"senderEmails/internal/domain/campaign"
+)
 
 type CampaignRepository struct{
 	campaigns []campaign.Campaign
@@ -15,4 +18,15 @@ func (c *CampaignRepository) Create(campaign *campaign.Campaign) (campaign.Campa
 
 func (c *CampaignRepository) Get() []campaign.Campaign {
 	return c.campaigns
+}
+
+
+func (c *CampaignRepository) GetById(id string) (*campaign.Campaign, error) {
+	for _, campaign := range c.campaigns {
+		if campaign.ID == id {
+			return &campaign, nil
+		}
+	}
+
+	return &campaign.Campaign{}, errors.New("campanha não encontrada")
 }

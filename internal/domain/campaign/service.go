@@ -33,3 +33,21 @@ func (s *Service) Get() []Campaign {
 
 	return campaigns
 }
+
+
+func (s *Service) GetById(id string) (contracts.GetCampaignByIdResponse, error) {
+	campaign, err := s.Repository.GetById(id)
+
+	if err != nil {
+		return contracts.GetCampaignByIdResponse{}, errors.New("campanha não encontrada")
+	}
+
+	formatCampaignResponse := contracts.GetCampaignByIdResponse{
+		ID:      campaign.ID,
+		Name:    campaign.Name,
+		Content: campaign.Content,
+		Status:  campaign.Status,
+	}
+
+	return formatCampaignResponse, nil
+}

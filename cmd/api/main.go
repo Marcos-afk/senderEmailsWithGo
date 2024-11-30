@@ -32,6 +32,7 @@ func main() {
 		r.Route("/campaigns", func(r chi.Router) {
 			r.Post("/", endpoints.HandlerError(handler.CampaignPost))
 			r.Get("/", endpoints.HandlerError(handler.CampaignsGet))
+			r.Get("/{id}", endpoints.HandlerError(handler.CampaignGetById))
 		})
 	})
 
