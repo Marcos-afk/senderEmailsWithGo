@@ -35,6 +35,11 @@ func (r *RepositoryMock) Get() ([]Campaign){
 	return args.Get(0).([]Campaign)
 }
 
+func (r *RepositoryMock) GetById(id string) (*Campaign, error){
+	args := r.Called(id)
+	return args.Get(0).(*Campaign), args.Error(1)
+}
+
 func Test_Create_Campaign(t *testing.T) {
 	assert := assert.New(t)
 
@@ -119,4 +124,32 @@ func Test_GetAll_Campaign(t *testing.T) {
 	foundedCampaigns := service.Get()
 	
 	assert.NotNil(foundedCampaigns)
+}
+
+func Test_GetCampaignById(t *testing.T) {
+	assert := assert.New(t)
+
+	repositoryMock := new(RepositoryMock)
+	service.Repository = repositoryMock
+
+	repositoryMock.On("GetById", mock.Anything).Return(&Campaign{}, nil)
+
+	_, err := service.GetById("123")
+	
+	assert.Nil(err)
+}
+
+
+func Test_GetCampaignById_Return_NotFoundError(t *testing.T){
+	assert := assert.New(t)
+
+	repositoryMock := new(RepositoryMock)
+	service.Repository = repositoryMock
+
+	repositoryMock.On("GetById", mock.Anything).Return(&Campaign{}, errors.New("campanha não encontrada"))
+
+	_, err := service.GetById("123")
+
+	assert.NotNil(err)
+	assert.Equal("campanha não encontrada", err.Error())
 }
