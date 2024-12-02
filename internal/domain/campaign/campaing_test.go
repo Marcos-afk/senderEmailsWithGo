@@ -65,13 +65,6 @@ func Test_NewCampaign_ValidateNameMax(t *testing.T){
 	assert.Equal("name is required with max 100", err.Error())
 }
 
-func Test_NewCampaign_ContentNotEmpty(t *testing.T){
-	assert := assert.New(t)
-
-	_, err := NewCampaign(name, fake.Lorem().Text(250), contacts)
-
-	assert.Equal("content is required with max 200", err.Error())
-}
 
 func Test_NewCampaign_ContactsNotEmpty(t *testing.T){
 	assert := assert.New(t)

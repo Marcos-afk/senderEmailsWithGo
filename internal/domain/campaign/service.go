@@ -51,3 +51,25 @@ func (s *Service) GetById(id string) (contracts.GetCampaignByIdResponse, error) 
 
 	return formatCampaignResponse, nil
 }
+
+
+
+func (s *Service) Cancel(id string) error {
+	campaign, foundErr := s.Repository.GetById(id)
+
+	if foundErr != nil {
+		return errors.New("campanha não encontrada")
+	}
+
+	if campaign.Status != PendingStatus {
+		return errors.New("campanha não pode ser cancelada")
+	}
+
+	campaign.Cancel()
+	_, updateErr := s.Repository.Update(campaign)
+	if updateErr != nil {
+		return errors.New("erro ao cancelar campanha " + updateErr.Error())
+	}
+
+	return nil
+}

@@ -13,6 +13,7 @@ const (
 	PendingStatus = "PENDING"
 	SentStatus    = "SENT"
 	FailedStatus  = "FAILED"
+	CanceledStatus = "CANCELED"
 )
 
 
@@ -66,4 +67,9 @@ func NewCampaign(name string, content string, emails []string) (*Campaign, error
 	}
 
 	return campaign, nil
+}
+
+
+func (c *Campaign) Cancel() {
+	c.Status = CanceledStatus
 }

@@ -1,6 +1,9 @@
 package fake
 
-import "senderEmails/internal/domain/campaign"
+import (
+	"errors"
+	"senderEmails/internal/domain/campaign"
+)
 
 type FakeCampaignRepository struct{
 	campaigns []campaign.Campaign
@@ -25,4 +28,14 @@ func (c *FakeCampaignRepository) GetById(id string) (*campaign.Campaign, error) 
 	}
 
 	return &campaign.Campaign{}, nil
+}
+
+func (c *FakeCampaignRepository) Update(updatedCampaign *campaign.Campaign) (campaign.Campaign, error) {
+	for i, existingCampaign := range c.campaigns {
+		if existingCampaign.ID == updatedCampaign.ID {
+			c.campaigns[i] = *updatedCampaign
+			return c.campaigns[i], nil
+		}
+	}
+	return campaign.Campaign{}, errors.New("campanha não encontrada")
 }

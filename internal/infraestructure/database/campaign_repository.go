@@ -41,3 +41,14 @@ func (c *CampaignRepository) GetById(id string) (*campaign.Campaign, error) {
 
 	return &foundCampaign, nil
 }
+
+
+func (c *CampaignRepository) Update(campaignData *campaign.Campaign) (campaign.Campaign, error) {
+	tx := c.Db.Save(&campaignData)
+
+	if tx.Error != nil {
+		return campaign.Campaign{}, tx.Error
+	}
+	
+	return *campaignData, nil
+}
