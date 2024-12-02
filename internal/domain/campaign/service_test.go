@@ -45,6 +45,12 @@ func (r *RepositoryMock) Update(campaign *Campaign) (Campaign, error){
 	return args.Get(0).(Campaign), args.Error(1)
 }
 
+
+func (r *RepositoryMock) Delete(id string) error{
+	args := r.Called(id)
+	return args.Error(0)
+}
+
 func Test_Create_Campaign(t *testing.T) {
 	assert := assert.New(t)
 

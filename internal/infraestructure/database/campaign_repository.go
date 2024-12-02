@@ -52,3 +52,19 @@ func (c *CampaignRepository) Update(campaignData *campaign.Campaign) (campaign.C
 	
 	return *campaignData, nil
 }
+
+func (c *CampaignRepository) Delete(id string) error {
+	tx := c.Db.Begin()
+
+	if err := tx.Where("campaign_id = ?", id).Delete(&campaign.Contact{}).Error; err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	if err := tx.Where("id = ?", id).Delete(&campaign.Campaign{}).Error; err != nil {
+		tx.Rollback() 
+		return err
+	}
+
+	return tx.Commit().Error
+}

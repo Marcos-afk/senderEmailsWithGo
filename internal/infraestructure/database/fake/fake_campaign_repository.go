@@ -39,3 +39,14 @@ func (c *FakeCampaignRepository) Update(updatedCampaign *campaign.Campaign) (cam
 	}
 	return campaign.Campaign{}, errors.New("campanha não encontrada")
 }
+
+func (c *FakeCampaignRepository) Delete(id string) error {
+	for i, existingCampaign := range c.campaigns {
+		if existingCampaign.ID == id {
+			c.campaigns = append(c.campaigns[:i], c.campaigns[i+1:]...)
+			return nil
+		}
+	}
+	
+	return errors.New("campanha não encontrada")
+}

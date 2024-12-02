@@ -73,3 +73,18 @@ func (s *Service) Cancel(id string) error {
 
 	return nil
 }
+
+func (s *Service) Delete(id string) error {
+	_, foundErr := s.Repository.GetById(id)
+
+	if foundErr != nil {
+		return errors.New("campanha não encontrada")
+	}
+
+	deleteErr := s.Repository.Delete(id)
+	if deleteErr != nil {
+		return errors.New("erro ao deletar campanha " + deleteErr.Error())
+	}
+
+	return nil
+}
