@@ -6,11 +6,19 @@ import (
 	internalerrors "senderEmails/internal/internal-errors"
 )
 
-type Service struct {
+type Service interface {
+	Get () []Campaign
+	GetById(id string) (*contracts.GetCampaignByIdResponse, error)
+	Create(campaign contracts.CreateCampaign) (*Campaign, error)
+	Cancel(id string) error
+	Delete(id string) error
+}
+
+type ServiceImp struct {
 	Repository Repository
 }
 
-func (s *Service) Create(createCampaign contracts.CreateCampaign) (*Campaign, error) {
+func (s *ServiceImp) Create(createCampaign contracts.CreateCampaign) (*Campaign, error) {
 	
 	campaign, domainError := NewCampaign(createCampaign.Name, createCampaign.Content, createCampaign.Emails)
 	if domainError != nil {
@@ -28,18 +36,18 @@ func (s *Service) Create(createCampaign contracts.CreateCampaign) (*Campaign, er
 }
 
 
-func (s *Service) Get() []Campaign {
+func (s *ServiceImp) Get() []Campaign {
 	campaigns := s.Repository.Get()
 
 	return campaigns
 }
 
 
-func (s *Service) GetById(id string) (contracts.GetCampaignByIdResponse, error) {
+func (s *ServiceImp) GetById(id string) (*contracts.GetCampaignByIdResponse, error) {
 	campaign, err := s.Repository.GetById(id)
 
 	if err != nil {
-		return contracts.GetCampaignByIdResponse{}, errors.New("campanha não encontrada")
+		return nil, errors.New("campanha não encontrada")
 	}
 
 	formatCampaignResponse := contracts.GetCampaignByIdResponse{
@@ -49,12 +57,11 @@ func (s *Service) GetById(id string) (contracts.GetCampaignByIdResponse, error) 
 		Status:  campaign.Status,
 	}
 
-	return formatCampaignResponse, nil
+	return &formatCampaignResponse, nil
 }
 
 
-
-func (s *Service) Cancel(id string) error {
+func (s *ServiceImp) Cancel(id string) error {
 	campaign, foundErr := s.Repository.GetById(id)
 
 	if foundErr != nil {
@@ -74,7 +81,7 @@ func (s *Service) Cancel(id string) error {
 	return nil
 }
 
-func (s *Service) Delete(id string) error {
+func (s *ServiceImp) Delete(id string) error {
 	_, foundErr := s.Repository.GetById(id)
 
 	if foundErr != nil {

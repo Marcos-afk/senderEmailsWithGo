@@ -21,14 +21,15 @@ func main() {
 	routes.Use(middleware.Recoverer)
 
 	db := database.NewConnectionToDB()
-	campaignService := campaign.Service{
+
+	campaignService := campaign.ServiceImp{
 		Repository: &database.CampaignRepository{
 			Db: db,
 		},
 	}
 
 	handler := endpoints.Handler{
-		CampaignService: campaignService,
+		CampaignService: &campaignService,
 	}
 
 	routes.Route("/api/v1", func(r chi.Router) {

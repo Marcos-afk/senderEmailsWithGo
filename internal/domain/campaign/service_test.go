@@ -17,55 +17,29 @@ var (
 		Emails: []string{"teste01@email.com", "teste02@email.com"} ,
 	}
 
-	service = Service{}
+	service = ServiceImp{}
+	repositoryMock *RepositoryMock
 )
 
 
-type RepositoryMock struct {
-	mock.Mock
-}
-
-func (r *RepositoryMock) Create(campaign *Campaign) (Campaign, error){
-	args := r.Called(campaign)
-	return args.Get(0).(Campaign), args.Error(1)
-}
-
-func (r *RepositoryMock) Get() ([]Campaign){
-	args := r.Called()
-	return args.Get(0).([]Campaign)
-}
-
-func (r *RepositoryMock) GetById(id string) (*Campaign, error){
-	args := r.Called(id)
-	return args.Get(0).(*Campaign), args.Error(1)
-}
-
-func (r *RepositoryMock) Update(campaign *Campaign) (Campaign, error){
-	args := r.Called(campaign)
-	return args.Get(0).(Campaign), args.Error(1)
-}
-
-
-func (r *RepositoryMock) Delete(id string) error{
-	args := r.Called(id)
-	return args.Error(0)
+func setUp() {
+	repositoryMock = new(RepositoryMock)
+	service.Repository = repositoryMock
 }
 
 func Test_Create_Campaign(t *testing.T) {
+	setUp()
+
 	assert := assert.New(t)
 
-	repositoryMock := new(RepositoryMock)
-	service.Repository = repositoryMock
-
-	repositoryMock.On("Create", mock.Anything).Return(Campaign{}, nil)
+	repositoryMock.On("Create", mock.Anything).Return(&Campaign{}, nil)
 
 	_, err := service.Create(createCampaign)
 	assert.Nil(err)
 }
 
 func Test_Create_Save_Campaign(t *testing.T) {
-	repositoryMock := new(RepositoryMock)
-	service.Repository = repositoryMock
+	setUp()
 
 	repositoryMock.On("Create", mock.MatchedBy(
 		func(campaign *Campaign) bool {
@@ -85,7 +59,7 @@ func Test_Create_Save_Campaign(t *testing.T) {
 			}
 			return true
 		},
-	)).Return(Campaign{}, nil)
+	)).Return(&Campaign{}, nil)
 
 	service.Create(createCampaign)
 
@@ -93,12 +67,11 @@ func Test_Create_Save_Campaign(t *testing.T) {
 }
 
 func Test_Create_Campaign_ValidateDomainError(t *testing.T) {
+	setUp()
+
 	assert := assert.New(t)
 
-	repositoryMock := new(RepositoryMock)
-	service.Repository = repositoryMock
-
-	repositoryMock.On("Create", mock.Anything).Return(Campaign{}, nil)
+	repositoryMock.On("Create", mock.Anything).Return(&Campaign{}, nil)
 
 	_, err := service.Create(contracts.CreateCampaign{
 		Name:    "",
@@ -111,12 +84,11 @@ func Test_Create_Campaign_ValidateDomainError(t *testing.T) {
 }
 
 func Test_Create_Campaign_ValidateRepositoryCreate(t *testing.T) {
+	setUp()
+
 	assert := assert.New(t)
 
-	repositoryMock := new(RepositoryMock)
-	service.Repository = repositoryMock
-
-	repositoryMock.On("Create", mock.Anything).Return(Campaign{}, errors.New("database error"))
+	repositoryMock.On("Create", mock.Anything).Return(&Campaign{}, errors.New("database error"))
 
 	_, error := service.Create(createCampaign)
 
@@ -125,10 +97,9 @@ func Test_Create_Campaign_ValidateRepositoryCreate(t *testing.T) {
 
 
 func Test_GetAll_Campaign(t *testing.T) {
-	assert := assert.New(t)
+	setUp()
 
-	repositoryMock := new(RepositoryMock)
-	service.Repository = repositoryMock
+	assert := assert.New(t)
 
 	repositoryMock.On("Get").Return([]Campaign{})
 
@@ -138,10 +109,9 @@ func Test_GetAll_Campaign(t *testing.T) {
 }
 
 func Test_GetCampaignById(t *testing.T) {
-	assert := assert.New(t)
+	setUp()
 
-	repositoryMock := new(RepositoryMock)
-	service.Repository = repositoryMock
+	assert := assert.New(t)
 
 	repositoryMock.On("GetById", mock.Anything).Return(&Campaign{}, nil)
 
@@ -152,10 +122,9 @@ func Test_GetCampaignById(t *testing.T) {
 
 
 func Test_GetCampaignById_Return_NotFoundError(t *testing.T){
-	assert := assert.New(t)
+	setUp()
 
-	repositoryMock := new(RepositoryMock)
-	service.Repository = repositoryMock
+	assert := assert.New(t)
 
 	repositoryMock.On("GetById", mock.Anything).Return(&Campaign{}, errors.New("campanha não encontrada"))
 
@@ -163,4 +132,101 @@ func Test_GetCampaignById_Return_NotFoundError(t *testing.T){
 
 	assert.NotNil(err)
 	assert.Equal("campanha não encontrada", err.Error())
+}
+
+
+
+func Test_DeleteCampaign_WithSuccess(t *testing.T) {
+	setUp()
+
+	assert := assert.New(t)
+
+	repositoryMock.On("GetById", mock.Anything).Return(&Campaign{}, nil)
+	repositoryMock.On("Delete", mock.Anything).Return(nil)
+
+	err := service.Delete("123")
+
+	assert.Nil(err)
+}
+
+func Test_DeleteCampaign_NotFoundError(t *testing.T) {
+	setUp()
+
+	assert := assert.New(t)
+
+	repositoryMock.On("GetById", mock.Anything).Return(&Campaign{}, errors.New("campanha não encontrada"))
+	repositoryMock.On("Delete", mock.Anything).Return(nil)
+
+	err := service.Delete("123")
+
+	assert.NotNil(err)
+	assert.Equal("campanha não encontrada", err.Error())
+}
+
+
+func Test_DeleteCampaign_RepositoryError(t *testing.T){
+	setUp()
+
+	assert := assert.New(t)
+
+	repositoryMock.On("GetById", mock.Anything).Return(&Campaign{}, nil)
+	repositoryMock.On("Delete", mock.Anything).Return(errors.New("database error"))
+
+	err := service.Delete("123")
+
+	assert.Equal("erro ao deletar campanha " + "database error", err.Error())
+}
+
+func Test_CancelCampaign_WithSuccess(t *testing.T) {
+	setUp()
+
+	assert := assert.New(t)
+
+	repositoryMock.On("GetById", mock.Anything).Return(&Campaign{Status: PendingStatus}, nil)
+	repositoryMock.On("Update", mock.Anything).Return(&Campaign{}, nil)
+
+	err := service.Cancel("123")
+
+	assert.Nil(err)
+}
+
+
+func Test_CancelCampaign_NotFoundError(t *testing.T) {
+	setUp()
+
+	assert := assert.New(t)
+
+	repositoryMock.On("GetById", mock.Anything).Return(&Campaign{}, errors.New("campanha não encontrada"))
+
+	err := service.Cancel("123")
+
+	assert.NotNil(err)
+	assert.Equal("campanha não encontrada", err.Error())
+}
+
+
+func Test_CancelCampaign_CampaignNotPendingError(t *testing.T) {
+	setUp()
+
+	assert := assert.New(t)
+
+	repositoryMock.On("GetById", mock.Anything).Return(&Campaign{Status: SentStatus}, nil)
+
+	err := service.Cancel("123")
+
+	assert.NotNil(err)
+	assert.Equal("campanha não pode ser cancelada", err.Error())
+}
+
+func Test_CancelCampaign_RepositoryError(t *testing.T) {
+	setUp()
+
+	assert := assert.New(t)
+
+	repositoryMock.On("GetById", mock.Anything).Return(&Campaign{Status: PendingStatus}, nil)
+	repositoryMock.On("Update", mock.Anything).Return(&Campaign{}, errors.New("database error"))
+
+	err := service.Cancel("123")
+
+	assert.Equal("erro ao cancelar campanha " + "database error", err.Error())
 }

@@ -12,14 +12,14 @@ type CampaignRepository struct{
 }
 
 
-func (c *CampaignRepository) Create(campaignData *campaign.Campaign) (campaign.Campaign, error) {
+func (c *CampaignRepository) Create(campaignData *campaign.Campaign) (*campaign.Campaign, error) {
 	tx := c.Db.Create(&campaignData)
 
 	if tx.Error != nil {
-		return campaign.Campaign{}, tx.Error
+		return nil, tx.Error
 	}
 	
-	return *campaignData, nil
+	return campaignData, nil
 }
 
 func (c *CampaignRepository) Get() []campaign.Campaign {
@@ -43,14 +43,14 @@ func (c *CampaignRepository) GetById(id string) (*campaign.Campaign, error) {
 }
 
 
-func (c *CampaignRepository) Update(campaignData *campaign.Campaign) (campaign.Campaign, error) {
+func (c *CampaignRepository) Update(campaignData *campaign.Campaign) (*campaign.Campaign, error) {
 	tx := c.Db.Save(&campaignData)
 
 	if tx.Error != nil {
-		return campaign.Campaign{}, tx.Error
+		return nil, tx.Error
 	}
 	
-	return *campaignData, nil
+	return campaignData, nil
 }
 
 func (c *CampaignRepository) Delete(id string) error {

@@ -2,31 +2,43 @@ package endpoints
 
 import (
 	"net/http"
-	"net/http/httptest"
-	"senderEmails/internal/infraestructure/database/fake"
+	"senderEmails/internal/contracts"
+	"senderEmails/internal/domain/campaign"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 )
 
-func Test_CampaignGetById_ReturnsCampaign(t *testing.T) {
+func Test_CampaignGetById(t *testing.T) {
+	setUp()
+
 	assert := assert.New(t)
 
-	CampaignServiceConst.Repository = &fake.FakeCampaignRepository{}
+	campaignId := "123"
+	campaignResponse := contracts.GetCampaignByIdResponse {
+		ID: campaignId,
+		Name: "Campaign 1",
+		Content: "Content 1",
+		Status: campaign.PendingStatus,
+	} 
 
-	HandlerConst.CampaignService = CampaignServiceConst
+	service.On("GetById", mock.Anything).Return(&campaignResponse, nil)
+	req, rr := newHttpTest("GET", "/", nil)
+	req = addParameter(req, "id", campaignId)
 
-	req, err := http.NewRequest("GET", "/campaigns/1", nil)
+	response, status, err := handler.CampaignGetById(rr, req)
 
-	if err != nil {
-		t.Fatal(err)
+	expectedResponse := struct {
+		Message  string                            `json:"message"`
+		Campaign contracts.GetCampaignByIdResponse `json:"campaign"`
+	}{
+		Message:  "Campanha encontrada com sucesso!",
+		Campaign: campaignResponse,
 	}
-
-	rr := httptest.NewRecorder()
-
-	response, status, err := HandlerConst.CampaignGetById(rr, req)
 
 	assert.Nil(err)
 	assert.Equal(http.StatusOK, status)
-	assert.NotNil(response)
+	assert.Equal(expectedResponse, response)
+
 }

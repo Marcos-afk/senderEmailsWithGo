@@ -2,33 +2,33 @@ package endpoints
 
 import (
 	"net/http"
-	"net/http/httptest"
-	"senderEmails/internal/infraestructure/database/fake"
+	"senderEmails/internal/domain/campaign"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 )
 
+func Test_CampaignsGet(t *testing.T) {
+	setUp()
 
-
-func  Test_CampaignsGet_ReturnsAllCampaigns(t *testing.T){
 	assert := assert.New(t)
 
-	CampaignServiceConst.Repository = &fake.FakeCampaignRepository{}
+	service.On("Get").Return([]campaign.Campaign{}, nil)
+	req, rr := newHttpTest("GET", "/", nil)
 
-	HandlerConst.CampaignService = CampaignServiceConst
+	response, status, err := handler.CampaignsGet(rr, req)
 
-	req, err := http.NewRequest("GET", "/", nil)
-
-	if err != nil {
-		t.Fatal(err)
+	expectedResponse := struct {
+		Message  string              `json:"message"`
+		Campaigns []campaign.Campaign `json:"campaigns"`
+	}{
+		Message:  "Campanhas encontradas com sucesso!",
+		Campaigns: []campaign.Campaign{},
 	}
-
-	rr := httptest.NewRecorder()
-
-	response, status, err := HandlerConst.CampaignsGet(rr, req)
 
 	assert.Nil(err)
 	assert.Equal(http.StatusOK, status)
-	assert.NotNil(response)
+	assert.Equal(expectedResponse, response)
+
 }
+

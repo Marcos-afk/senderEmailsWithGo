@@ -9,10 +9,6 @@ func (h *Handler) CampaignsGet(w http.ResponseWriter, r *http.Request) (interfac
 
 	campaignsFound := h.CampaignService.Get()
 
-	if campaignsFound == nil {
-		campaignsFound = []campaign.Campaign{}
-	}
-
 	response := struct {
 		Message  string              `json:"message"`
 		Campaigns []campaign.Campaign `json:"campaigns"`
