@@ -1,7 +1,8 @@
-package campaign
+package mocks
 
 import (
 	"senderEmails/internal/contracts"
+	"senderEmails/internal/domain/campaign"
 
 	"github.com/stretchr/testify/mock"
 )
@@ -11,9 +12,9 @@ type CampaignServiceMock struct {
 }
 
 
-func (c *CampaignServiceMock) Get() []Campaign {
+func (c *CampaignServiceMock) Get() []campaign.Campaign {
 	args := c.Called()
-	return args.Get(0).([]Campaign)
+	return args.Get(0).([]campaign.Campaign)
 }
 
 func (c *CampaignServiceMock) GetById(id string) (*contracts.GetCampaignByIdResponse, error) {
@@ -21,9 +22,9 @@ func (c *CampaignServiceMock) GetById(id string) (*contracts.GetCampaignByIdResp
 	return args.Get(0).(*contracts.GetCampaignByIdResponse), args.Error(1)
 }
 
-func (c *CampaignServiceMock) Create(newCampaign contracts.CreateCampaign) (*Campaign, error) {
+func (c *CampaignServiceMock) Create(newCampaign contracts.CreateCampaign) (*campaign.Campaign, error) {
 	args := c.Called(newCampaign)
-	return args.Get(0).(*Campaign), args.Error(1)
+	return args.Get(0).(*campaign.Campaign), args.Error(1)
 }
 
 func (c *CampaignServiceMock) Cancel(id string) error {

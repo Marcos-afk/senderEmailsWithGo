@@ -1,4 +1,4 @@
-package endpoints
+package tests
 
 import (
 	"net/http"
@@ -10,18 +10,12 @@ import (
 	"github.com/stretchr/testify/mock"
 )
 
-var (
-	body              = contracts.CreateCampaign{
-		Name:    "teste",
-		Content: "Hi everyone",
-		Emails:  []string{"teste@teste.com"},
-	}
-)
+
 
 func TestCampaignPost(t *testing.T) {
 	setUp()
 
-	service.On("Create", mock.MatchedBy(func(request contracts.CreateCampaign) bool {
+	campaignServiceMock.On("Create", mock.MatchedBy(func(request contracts.CreateCampaign) bool {
 		if request.Name == body.Name &&
 			request.Content == body.Content {
 			return true

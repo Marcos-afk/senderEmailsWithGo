@@ -1,4 +1,4 @@
-package endpoints
+package tests
 
 import (
 	"net/http"
@@ -8,21 +8,22 @@ import (
 	"github.com/stretchr/testify/mock"
 )
 
-func Test_CampaignCancelPatch(t *testing.T) {
-	setUp()
+func Test_CampaignDelete(t *testing.T) {
+	setUp()	
+
 
 	assert := assert.New(t)
 
-	service.On("Cancel", mock.Anything).Return(nil)
-	req, rr := newHttpTest("PATCH", "/", nil)
+	campaignServiceMock.On("Delete", mock.Anything).Return(nil)
+	req, rr := newHttpTest("DELETE", "/", nil)
 	req = addParameter(req, "id", "123")
 
-	response, status, err := handler.CampaignCancelPatch(rr, req)
+	response, status, err := handler.CampaignDelete(rr, req)
 
 	expectedResponse := struct {
 		Message string `json:"message"`
 	}{
-		Message: "Campanha cancelada com sucesso!",
+		Message: "Campanha apagada com sucesso!",
 	}
 
 	assert.Nil(err)

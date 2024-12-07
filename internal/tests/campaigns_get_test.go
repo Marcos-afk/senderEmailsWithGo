@@ -1,4 +1,4 @@
-package endpoints
+package tests
 
 import (
 	"net/http"
@@ -13,7 +13,7 @@ func Test_CampaignsGet(t *testing.T) {
 
 	assert := assert.New(t)
 
-	service.On("Get").Return([]campaign.Campaign{}, nil)
+	campaignServiceMock.On("Get").Return([]campaign.Campaign{}, nil)
 	req, rr := newHttpTest("GET", "/", nil)
 
 	response, status, err := handler.CampaignsGet(rr, req)

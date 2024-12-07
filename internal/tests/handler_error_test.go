@@ -1,9 +1,10 @@
-package endpoints
+package tests
 
 import (
 	"errors"
 	"net/http"
 	"net/http/httptest"
+	"senderEmails/internal/endpoints"
 	internalerrors "senderEmails/internal/internal-errors"
 	"testing"
 
@@ -17,7 +18,7 @@ func Test_HandlerError_When_Returning_InternalError(t *testing.T){
 		return nil, 0, internalerrors.ErrInternal
 	}
 
-	handlerFunc := HandlerError(endpoint)
+	handlerFunc := endpoints.HandlerError(endpoint)
 
 	req, _ := http.NewRequest("GET", "/", nil)
 	res := httptest.NewRecorder()
@@ -36,7 +37,7 @@ func Test_HandlerError_When_Returning_BadRequest(t *testing.T){
 		return nil, 0, errors.New("Bad Request")
 	}
 
-	handlerFunc := HandlerError(endpoint)
+	handlerFunc := endpoints.HandlerError(endpoint)
 
 	req, _ := http.NewRequest("GET", "/", nil)
 	res := httptest.NewRecorder()
@@ -59,7 +60,7 @@ func Test_HandlerError_When_Returning_Object(t *testing.T){
 		}, 200, nil
 	}
 
-	handlerFunc := HandlerError(endpoint)
+	handlerFunc := endpoints.HandlerError(endpoint)
 
 	req, _ := http.NewRequest("GET", "/", nil)
 	res := httptest.NewRecorder()
@@ -77,7 +78,7 @@ func Test_HandlerError_When_Returning_NoContent(t *testing.T){
 		return nil, 0, nil
 	}
 
-	handlerFunc := HandlerError(endpoint)
+	handlerFunc := endpoints.HandlerError(endpoint)
 
 	req, _ := http.NewRequest("GET", "/", nil)
 	res := httptest.NewRecorder()

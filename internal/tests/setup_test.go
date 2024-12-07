@@ -1,4 +1,4 @@
-package endpoints
+package tests
 
 import (
 	"bytes"
@@ -6,21 +6,19 @@ import (
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
-	"senderEmails/internal/domain/campaign"
+	"senderEmails/internal/tests/mocks"
 
 	"github.com/go-chi/chi/v5"
 )
 
-var (
-	service *campaign.CampaignServiceMock
-	handler = Handler{}
-)
 
 
 
 func setUp(){
-	service = new (campaign.CampaignServiceMock)
-	handler.CampaignService = service
+	campaignRepositoryMock = new(mocks.CampaignRepositoryMock)
+	campaignServiceMock = new (mocks.CampaignServiceMock)
+	campaignServiceImp.Repository = campaignRepositoryMock
+	handler.CampaignService = campaignServiceMock
 }
 
 func newHttpTest(method string, url string, body interface{}) (*http.Request, *httptest.ResponseRecorder) {

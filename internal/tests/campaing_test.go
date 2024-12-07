@@ -1,57 +1,50 @@
-package campaign
+package tests
 
 import (
+	"senderEmails/internal/domain/campaign"
 	"testing"
 	"time"
 
-	"github.com/jaswdr/faker/v2"
 	"github.com/stretchr/testify/assert"
 )
 
 
-var (
-	name = "Test Campaign"
-	content = "<h1>Test Content</h1>"
-	contacts = []string{"contact01@email.com", "contact02@email.com"}
-	fake = faker.New()
-)
-
 func Test_NewCampaign_CreateCampaign(t *testing.T){
 	assert := assert.New(t)
 
-	campaign, _ := NewCampaign(name, content, contacts)
+	createdCampaign, _ := campaign.NewCampaign(name, content, contacts)
 
-	assert.Equal(name, campaign.Name)
-	assert.Equal(PendingStatus, campaign.Status)
-	assert.Equal(content, campaign.Content)
-	assert.Len(campaign.Contacts, 2)
+	assert.Equal(name, createdCampaign.Name)
+	assert.Equal(campaign.PendingStatus, createdCampaign.Status)
+	assert.Equal(content, createdCampaign.Content)
+	assert.Len(createdCampaign.Contacts, 2)
 } 
 
 func Test_NewCampaign_IdIsNotNil(t *testing.T){
 	assert := assert.New(t)
 
-	campaign, _ := NewCampaign(name, content, contacts)
+	createdCampaign, _ := campaign.NewCampaign(name, content, contacts)
 
-	assert.NotNil(campaign.ID)
+	assert.NotNil(createdCampaign.ID)
 }
 
 
 func Test_NewCampaign_CreateAtMustBeNow(t *testing.T){
 	assert := assert.New(t)
 
-	campaign, _ := NewCampaign(name, content, contacts)
+	createdCampaign, _ := campaign.NewCampaign(name, content, contacts)
 
 	dateNow := time.Now().Add(-time.Minute)
 
-	assert.NotNil(campaign.CreatedAt)
-	assert.Greater(campaign.CreatedAt, dateNow)
+	assert.NotNil(createdCampaign.CreatedAt)
+	assert.Greater(createdCampaign.CreatedAt, dateNow)
 }
 
 
 func Test_NewCampaign_NameNotEmpty(t *testing.T){
 	assert := assert.New(t)
 
-	_, err := NewCampaign("", content, contacts)
+	_, err := campaign.NewCampaign("", content, contacts)
 
 	assert.Equal("name is required with min 5", err.Error())
 }
@@ -60,7 +53,7 @@ func Test_NewCampaign_NameNotEmpty(t *testing.T){
 func Test_NewCampaign_ValidateNameMax(t *testing.T){
 	assert := assert.New(t)
 
-	_, err := NewCampaign(fake.Lorem().Text(300), content, contacts)
+	_, err := campaign.NewCampaign(fake.Lorem().Text(300), content, contacts)
 
 	assert.Equal("name is required with max 100", err.Error())
 }
@@ -69,7 +62,7 @@ func Test_NewCampaign_ValidateNameMax(t *testing.T){
 func Test_NewCampaign_ContactsNotEmpty(t *testing.T){
 	assert := assert.New(t)
 
-	_, err := NewCampaign(name, content, []string{})
+	_, err := campaign.NewCampaign(name, content, []string{})
 
 	assert.Equal("contacts is required with min 1", err.Error())
 }

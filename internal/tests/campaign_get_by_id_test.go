@@ -1,4 +1,4 @@
-package endpoints
+package tests
 
 import (
 	"net/http"
@@ -23,7 +23,7 @@ func Test_CampaignGetById(t *testing.T) {
 		Status: campaign.PendingStatus,
 	} 
 
-	service.On("GetById", mock.Anything).Return(&campaignResponse, nil)
+	campaignServiceMock.On("GetById", mock.Anything).Return(&campaignResponse, nil)
 	req, rr := newHttpTest("GET", "/", nil)
 	req = addParameter(req, "id", campaignId)
 
