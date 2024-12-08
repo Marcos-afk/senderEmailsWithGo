@@ -4,8 +4,10 @@ import (
 	"log"
 	"net/http"
 	"senderEmails/internal/domain/campaign"
+	"senderEmails/internal/domain/user"
 	"senderEmails/internal/endpoints"
-	"senderEmails/internal/infraestructure/database"
+	"senderEmails/internal/infrastructure/database"
+	"senderEmails/internal/infrastructure/middlewares"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
@@ -22,6 +24,13 @@ func main() {
 
 	db := database.NewConnectionToDB()
 
+	userService := user.ServiceImp{
+		Repository: &database.UserRepository{
+			Db: db,
+		},
+	}
+
+
 	campaignService := campaign.ServiceImp{
 		Repository: &database.CampaignRepository{
 			Db: db,
@@ -30,15 +39,23 @@ func main() {
 
 	handler := endpoints.Handler{
 		CampaignService: &campaignService,
+		UserService:     &userService,
 	}
+
+	authMiddleware := middlewares.AuthMiddleware(&userService)
 
 	routes.Route("/api/v1", func(r chi.Router) {
 		r.Route("/campaigns", func(r chi.Router) {
+			r.Use(authMiddleware)
 			r.Post("/", endpoints.HandlerError(handler.CampaignPost))
 			r.Get("/", endpoints.HandlerError(handler.CampaignsGet))
 			r.Get("/{id}", endpoints.HandlerError(handler.CampaignGetById))
 			r.Patch("/{id}/cancel", endpoints.HandlerError(handler.CampaignCancelPatch))
 			r.Delete("/{id}", endpoints.HandlerError(handler.CampaignDelete))
+		})
+
+		r.Route("/auth", func(r chi.Router) {
+			r.Post("/login", endpoints.HandlerError(handler.UserLoginPost))
 		})
 	})
 

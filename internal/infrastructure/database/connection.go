@@ -2,6 +2,7 @@ package database
 
 import (
 	"senderEmails/internal/domain/campaign"
+	"senderEmails/internal/domain/user"
 
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -15,7 +16,7 @@ func NewConnectionToDB() *gorm.DB {
 	}
 
 	 
-	 migrateError := db.AutoMigrate(&campaign.Campaign{}, &campaign.Contact{})
+	 migrateError := db.AutoMigrate(&campaign.Campaign{}, &campaign.Contact{}, &user.User{})
 
 	 if migrateError != nil {
 		panic("Falha ao criar as tabelas! " + migrateError.Error())
@@ -24,3 +25,4 @@ func NewConnectionToDB() *gorm.DB {
 	
 	return db
 }
+

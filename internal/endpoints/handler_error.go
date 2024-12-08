@@ -1,10 +1,8 @@
 package endpoints
 
 import (
-	"errors"
 	"net/http"
 	internalerrors "senderEmails/internal/internal-errors"
-	"strings"
 
 	"github.com/go-chi/render"
 )
@@ -18,14 +16,7 @@ func HandlerError(endpointFunc EndpointFunc) http.HandlerFunc {
 		var statusCode int
 
 		if err != nil {
-			
-			if errors.Is(err, internalerrors.ErrInternal){
-				statusCode = http.StatusInternalServerError
-			} else if strings.Contains(err.Error(), "não encontrada") || strings.Contains(err.Error(), "não encontrado"){
-				statusCode = http.StatusNotFound
-			}else{
-				statusCode = http.StatusBadRequest
-			}
+		  statusCode = internalerrors.GetStatusCodeFromError(err)
 
 			render.Status(r, statusCode)
 			render.JSON(w, r, struct {
@@ -35,6 +26,7 @@ func HandlerError(endpointFunc EndpointFunc) http.HandlerFunc {
 				Message: err.Error(),
 				Status:  int32(statusCode),
 			})
+			
 			return
 		}
 
@@ -48,3 +40,4 @@ func HandlerError(endpointFunc EndpointFunc) http.HandlerFunc {
 		render.NoContent(w, r)
 	})
 }
+
