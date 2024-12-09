@@ -24,7 +24,7 @@ func (c *CampaignRepository) Create(campaignData *campaign.Campaign) (*campaign.
 
 func (c *CampaignRepository) Get() []campaign.Campaign {
 	var campaigns []campaign.Campaign
-  
+	
 	c.Db.Preload("Contacts").Find(&campaigns)
 
 	return campaigns

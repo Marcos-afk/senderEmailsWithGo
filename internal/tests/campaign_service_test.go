@@ -44,6 +44,10 @@ func Test_Create_Save_Campaign(t *testing.T) {
 			if len(newCampaign.Contacts) != len(createCampaign.Emails) {
 				return false
 			}
+
+			if newCampaign.UserId != createCampaign.CreatedBy {
+				return false
+			}
 			return true
 		},
 	)).Return(&campaign.Campaign{}, nil)
@@ -64,6 +68,7 @@ func Test_Create_Campaign_ValidateDomainError(t *testing.T) {
 		Name:    "",
 		Content: "",
 		Emails:  []string{},
+		CreatedBy: "",
 	})
 
 	assert.NotNil(err)

@@ -13,6 +13,7 @@ var (
 	name     = "Test Campaign"
 	content  = "<h1>Test Content</h1>"
 	contacts = []string{"contact01@email.com", "contact02@email.com"}
+	createdBy = "1234567"
 	fake     = faker.New()
 	body     = contracts.CreateCampaign{
 		Name:    "teste",
@@ -23,7 +24,7 @@ var (
 		Name:    name,
 		Content: content,
 		Emails:  contacts,
-
+		CreatedBy: createdBy,
 	}
 	campaignRepositoryMock *mocks.CampaignRepositoryMock
 	campaignServiceMock *mocks.CampaignServiceMock

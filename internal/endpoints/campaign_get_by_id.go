@@ -17,7 +17,10 @@ func (h *Handler) CampaignGetById(w http.ResponseWriter, r *http.Request) (inter
 		Campaign contracts.GetCampaignByIdResponse `json:"campaign"`
 	}{
 		Message:  "Campanha encontrada com sucesso!",
-		Campaign: *campaignFound,
+	}
+
+	if err == nil {
+		response.Campaign = *campaignFound
 	}
 
 	return response, http.StatusOK, err

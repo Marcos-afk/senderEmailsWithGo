@@ -21,8 +21,8 @@ func (h *Handler) UserLoginPost(w http.ResponseWriter, r *http.Request) (interfa
 	session, err := h.UserService.Login(request)
 
 	response := struct {
-		Message string `json:"message"`
-		Token      string `json:"id"`
+		Message   string `json:"message"`
+		Token      string `json:"token"`
 	}{
 		Message: "Login realizado com sucesso!",
 		Token:      "",

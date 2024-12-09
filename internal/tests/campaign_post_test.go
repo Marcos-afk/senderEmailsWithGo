@@ -1,9 +1,11 @@
 package tests
 
 import (
+	"context"
 	"net/http"
 	"senderEmails/internal/contracts"
 	"senderEmails/internal/domain/campaign"
+	"senderEmails/internal/infrastructure/middlewares"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -24,7 +26,7 @@ func TestCampaignPost(t *testing.T) {
 		}
 	})).Return(&campaign.Campaign{}, nil)
  
-
+ 
 	expectedResponse := struct {
 		Message  string            `json:"message"`
 		ID 		 string            `json:"id"`
@@ -33,7 +35,13 @@ func TestCampaignPost(t *testing.T) {
 		ID: "",
 	}
 
+
+	userID := "test-user-id"
+	
 	req, rr := newHttpTest("POST", "/", body)
+	ctx := context.WithValue(req.Context(), middlewares.UserIdKey, userID)
+	req = req.WithContext(ctx)
+	
 
 	response, status, err := handler.CampaignPost(rr, req)
 

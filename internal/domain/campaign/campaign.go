@@ -26,17 +26,18 @@ type Contact struct {
 }
 
 type Campaign struct {
-	ID        string    `json:"id" validate:"required"`
-	Name      string    `json:"name" validate:"min=5,max=100"`
-	Content   string    `json:"content" validate:"min=5"`
-	Contacts  []Contact `json:"contacts" validate:"min=1,dive"`
-	Status 		string    `json:"status" validate:"required"`
+	ID        string     `json:"id" validate:"required"`
+	Name      string     `json:"name" validate:"min=5,max=100"`
+	Content   string     `json:"content" validate:"min=5"`
+	Contacts  []Contact  `json:"contacts" validate:"min=1,dive"`
+	Status 		string     `json:"status" validate:"required"`
+	UserId    string     `json:"user_id" validate:"required"`
 	CreatedAt time.Time `json:"created_at" validate:"required"`
 }
 
 
 
-func NewCampaign(name string, content string, emails []string) (*Campaign, error) {
+func NewCampaign(name string, content string, createdBy string, emails []string) (*Campaign, error) {
 	campaignId := xid.New().String()
 	contacts := make([]Contact, 0, len(emails))
 
@@ -57,6 +58,7 @@ func NewCampaign(name string, content string, emails []string) (*Campaign, error
 		Name:      name,
 		Content:   content,
 		Status: 	PendingStatus,
+		UserId: createdBy,
 		Contacts:  contacts,
 		CreatedAt: time.Now(),
 	}

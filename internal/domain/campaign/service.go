@@ -20,7 +20,11 @@ type ServiceImp struct {
 
 func (s *ServiceImp) Create(createCampaign contracts.CreateCampaign) (*Campaign, error) {
 	
-	campaign, domainError := NewCampaign(createCampaign.Name, createCampaign.Content, createCampaign.Emails)
+	campaign, domainError := NewCampaign(createCampaign.Name, 
+		createCampaign.Content,
+		createCampaign.CreatedBy, 
+		createCampaign.Emails)
+
 	if domainError != nil {
 		return nil, errors.New(domainError.Error())
 	}
