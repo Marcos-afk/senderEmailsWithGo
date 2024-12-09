@@ -27,26 +27,26 @@ func CreateToken(createToken contracts.CreateToken) (string, error) {
 }
 
 
-func VerifyToken(tokenString string, validateUserFunc func(userId string) (bool, error)) error {
+func VerifyToken(tokenString string, validateUserFunc func(userId string) (bool, error)) (string, error) {
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 		return secretKey, nil
 	})
 
 	if err != nil || !token.Valid {
-		return errors.New("token inválido")
+		return "", errors.New("token inválido")
 	}
 
 	claims, ok := token.Claims.(jwt.MapClaims)
 	sub, valid := claims["sub"].(string)
 	if !ok || !valid || sub == "" {
-		return errors.New("token inválido")
+		return "", errors.New("token inválido")
 	}
 
 	isValid, err := validateUserFunc(sub)
 	if err != nil || !isValid {
-		return errors.New("token inválido")
+		return "", errors.New("token inválido")
 	}
 
-	return nil
+	return sub, nil
 }
 
