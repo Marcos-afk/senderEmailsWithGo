@@ -1,6 +1,7 @@
 package database
 
 import (
+	"senderEmails/internal"
 	"senderEmails/internal/domain/campaign"
 	"senderEmails/internal/domain/user"
 
@@ -9,7 +10,8 @@ import (
 )
 
 func NewConnectionToDB() *gorm.DB {
-	dbAddress := "host=localhost user=postgres password=postgres dbname=sender_emails port=5432 sslmode=disable"
+	dbAddress := internal.DATABASE_URL
+
 	db, err := gorm.Open(postgres.Open(dbAddress), &gorm.Config{})
 	if err != nil {
 		panic("Falha ao se conectar ao banco de dados! " + err.Error())

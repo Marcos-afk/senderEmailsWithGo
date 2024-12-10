@@ -2,13 +2,14 @@ package libs
 
 import (
 	"errors"
+	"senderEmails/internal"
 	"senderEmails/internal/contracts"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
 )
 
-var secretKey = []byte("secret")
+var secretKey = []byte(internal.JWT_SECRET_KEY)
 
 func CreateToken(createToken contracts.CreateToken) (string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256,

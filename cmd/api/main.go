@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 	"net/http"
+	"senderEmails/internal"
 	"senderEmails/internal/domain/campaign"
 	"senderEmails/internal/domain/user"
 	"senderEmails/internal/endpoints"
@@ -15,6 +16,8 @@ import (
 
 
 func main() {
+	internal.LoadEnvs()
+	
 	routes := chi.NewRouter()
 
 	routes.Use(middleware.RequestID)
@@ -59,7 +62,7 @@ func main() {
 		})
 	})
 
-	port := ":5000"
+	port := internal.SERVER_PORT
 	log.Printf("🚀 Servidor iniciado na porta %s", port)
 
 	if err := http.ListenAndServe(port, routes); err != nil {

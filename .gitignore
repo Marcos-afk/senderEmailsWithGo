@@ -29,3 +29,6 @@
 # Arquivos específicos do sistema operacional
 Thumbs.db
 Desktop.ini
+
+# Arquivos de configuração
+*.env
