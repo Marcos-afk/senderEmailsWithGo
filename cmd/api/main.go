@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 	"net/http"
+	"regexp"
 	"senderEmails/internal"
 	"senderEmails/internal/domain/campaign"
 	"senderEmails/internal/domain/user"
@@ -12,13 +13,33 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
+	"github.com/go-chi/cors"
 )
 
+func prodCors(regexList []*regexp.Regexp) func(r *http.Request, origin string) bool {
+	return func(r *http.Request, origin string) bool {
+		for _, regex := range regexList {
+			if regex.MatchString(origin) || origin == "" {
+				return true
+			}
+		}
+		return false
+	}
+}
 
 func main() {
 	internal.LoadEnvs()
 	
 	routes := chi.NewRouter()
+
+	routes.Use(cors.Handler(cors.Options{
+		AllowOriginFunc: prodCors(internal.WHITELIST),
+		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+    AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token"},
+    ExposedHeaders:   []string{"Link"},
+		AllowCredentials: true,
+		MaxAge:           300,
+	}))
 
 	routes.Use(middleware.RequestID)
 	routes.Use(middleware.RealIP)
