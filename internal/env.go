@@ -34,9 +34,14 @@ func getCorsWhitelist() []*regexp.Regexp {
 	var regexList []*regexp.Regexp
 
 	for _, domain := range domains {
+		domain = strings.TrimPrefix(domain, "http://")
+		domain = strings.TrimPrefix(domain, "https://")
+
 		regexString := strings.ReplaceAll(domain, ".", "\\.")
 		regexString = strings.ReplaceAll(regexString, "*", ".*")
-		regexList = append(regexList, regexp.MustCompile("^" + regexString + "$"))
+
+		regexString = "^(http|https)://" + regexString + "$"
+		regexList = append(regexList, regexp.MustCompile(regexString))
 	}
 
 	return regexList
