@@ -3,7 +3,7 @@ package user
 import (
 	"errors"
 	"senderEmails/internal/contracts"
-	"senderEmails/internal/infrastructure/libs"
+	"senderEmails/internal/infrastructure/providers"
 )
 
 type Service interface {
@@ -14,6 +14,8 @@ type Service interface {
 
 type ServiceImp struct {
 	Repository Repository
+	HashProvider providers.HashProvider
+	AuthProvider providers.AuthProvider
 }
 
 
@@ -24,12 +26,12 @@ func (s *ServiceImp) Login(data contracts.UserLoginRequest) (*contracts.UserLogi
 		return nil, errors.New("email e/ou senha inválidos")
 	}
 
-	passwordMatch := libs.VerifyPassword(data.Password, userFound.Password)
+	passwordMatch := s.HashProvider.VerifyPassword(data.Password, userFound.Password)
 	if !passwordMatch {
 		return nil, errors.New("email e/ou senha inválidos")
 	}
 
-	token, err := libs.CreateToken(contracts.CreateToken{
+	token, err := s.AuthProvider.CreateToken(contracts.CreateToken{
 		Sub: userFound.ID,
 		Name: userFound.Name,
 	})

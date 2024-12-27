@@ -18,7 +18,7 @@ func NewConnectionToDB() *gorm.DB {
 	}
 
 	 
-	 migrateError := db.AutoMigrate(&campaign.Campaign{}, &campaign.Contact{}, &user.User{})
+	 migrateError := db.AutoMigrate(&user.User{},&campaign.Campaign{}, &campaign.Contact{})
 
 	 if migrateError != nil {
 		panic("Falha ao criar as tabelas! " + migrateError.Error())

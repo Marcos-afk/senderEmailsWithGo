@@ -16,11 +16,10 @@ var (
 	WHITELIST      []*regexp.Regexp
 )
 
-func LoadEnvs() {
+func init() {
 	if err := godotenv.Load(); err != nil {
 		log.Fatalf("Erro ao carregar o arquivo .env: %v", err)
 	}
-
 
 	DATABASE_URL = getEnv("DATABASE_URL")
 	SERVER_PORT = getEnv("SERVER_PORT")

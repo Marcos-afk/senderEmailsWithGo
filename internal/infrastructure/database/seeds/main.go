@@ -3,13 +3,14 @@ package main
 import (
 	"senderEmails/internal/domain/user"
 	"senderEmails/internal/infrastructure/database"
-	"senderEmails/internal/infrastructure/libs"
+	"senderEmails/internal/infrastructure/providers"
 	"time"
 
 	"github.com/rs/xid"
 	"gorm.io/gorm"
 )
 
+var hashProvider = providers.HashProviderImp{}
 
 var users = []user.User{
 	{
@@ -17,7 +18,7 @@ var users = []user.User{
 		Name: "ADMIN",
 		Email: "admin@email.com",
 		Password: func() string {
-			hashedPassword, err := libs.HashPassword("12345678")
+			hashedPassword, err := hashProvider.HashPassword("12345678")
 			if err != nil {
 				panic(err)
 			}

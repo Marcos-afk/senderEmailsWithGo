@@ -4,7 +4,7 @@ import (
 	"context"
 	"net/http"
 	"senderEmails/internal/domain/user"
-	"senderEmails/internal/infrastructure/libs"
+	"senderEmails/internal/infrastructure/providers"
 
 	"github.com/go-chi/render"
 )
@@ -16,6 +16,8 @@ type AuthMiddlewareResponse struct {
 type contextKey string
 
 const UserIdKey = contextKey("userId")
+
+var authProvider = providers.AuthProviderImp{}
 
 func AuthMiddleware(userService user.Service) func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
@@ -35,7 +37,7 @@ func AuthMiddleware(userService user.Service) func(http.Handler) http.Handler {
 			}
 
 			tokenString = tokenString[len(prefix):]
-			sub, err := libs.VerifyToken(tokenString, userService.ValidateUserId)
+			sub, err := authProvider.VerifyToken(tokenString, userService.ValidateUserId)
 			if err != nil {
 				render.Status(r, http.StatusUnauthorized)
 				render.JSON(w, r, AuthMiddlewareResponse{Message: "token inválido"})

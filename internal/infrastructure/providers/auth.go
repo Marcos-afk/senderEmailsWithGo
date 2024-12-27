@@ -1,4 +1,4 @@
-package libs
+package providers
 
 import (
 	"errors"
@@ -11,7 +11,14 @@ import (
 
 var secretKey = []byte(internal.JWT_SECRET_KEY)
 
-func CreateToken(createToken contracts.CreateToken) (string, error) {
+type AuthProvider interface {
+	CreateToken(createToken contracts.CreateToken) (string, error)
+	VerifyToken(tokenString string, validateUserFunc func(userId string) (bool, error)) (string, error)
+}
+
+type AuthProviderImp struct {}
+
+func (a *AuthProviderImp) CreateToken(createToken contracts.CreateToken) (string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256,
 		jwt.MapClaims{
 			"sub": 		createToken.Sub,
@@ -27,8 +34,7 @@ func CreateToken(createToken contracts.CreateToken) (string, error) {
 	return tokenString, nil
 }
 
-
-func VerifyToken(tokenString string, validateUserFunc func(userId string) (bool, error)) (string, error) {
+func (a *AuthProviderImp) VerifyToken(tokenString string, validateUserFunc func(userId string) (bool, error)) (string, error) {
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 		return secretKey, nil
 	})
@@ -50,4 +56,3 @@ func VerifyToken(tokenString string, validateUserFunc func(userId string) (bool,
 
 	return sub, nil
 }
-

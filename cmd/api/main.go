@@ -9,6 +9,7 @@ import (
 	"senderEmails/internal/endpoints"
 	"senderEmails/internal/infrastructure/database"
 	"senderEmails/internal/infrastructure/middlewares"
+	"senderEmails/internal/infrastructure/providers"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
@@ -29,8 +30,6 @@ func  AllowOriginFunc (r *http.Request, origin string) bool {
 
 
 func main() {
-	internal.LoadEnvs()
-	
 	routes := chi.NewRouter()
 
 	routes.Use(middleware.RequestID)
@@ -52,6 +51,8 @@ func main() {
 		Repository: &database.UserRepository{
 			Db: db,
 		},
+		HashProvider: &providers.HashProviderImp{},
+		AuthProvider: &providers.AuthProviderImp{},
 	}
 
 	campaignService := campaign.ServiceImp{
