@@ -1,7 +1,7 @@
 package contracts
 
 type SendMailRequest struct {
-	To      string
+	To      []string
 	Subject string
 	Message string
 }

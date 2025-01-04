@@ -21,7 +21,7 @@ func (m *MailProviderImp) SendMail(sendMailRequest contracts.SendMailRequest) er
 	message := gomail.NewMessage()
 
 	message.SetHeader("From", internal.MAIL_FROM)
-	message.SetHeader("To", sendMailRequest.To)
+	message.SetHeader("To", sendMailRequest.To...)
 	message.SetHeader("Subject", sendMailRequest.Subject)
 	message.SetBody("text/html", sendMailRequest.Message)
 

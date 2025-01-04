@@ -12,8 +12,6 @@ import (
 )
 
 
-
-
 func setUp(){
 	campaignRepositoryMock = new(mocks.CampaignRepositoryMock)
 	campaignServiceMock = new (mocks.CampaignServiceMock)
@@ -39,7 +37,3 @@ func addParameter(req *http.Request, keyParameter string, valueParameter string)
 	return req.WithContext(context.WithValue(req.Context(), chi.RouteCtxKey, chiContext))
 }
 
-func addContext(req *http.Request, keyParameter string, valueParameter string) *http.Request {
-	ctx := context.WithValue(req.Context(), keyParameter, valueParameter)
-	return req.WithContext(ctx)
-}
