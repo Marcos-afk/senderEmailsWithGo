@@ -15,6 +15,8 @@ type MailProvider interface {
 
 type MailProviderImp struct {}
 
+type FakeMailProvider struct {}
+
 
 func (m *MailProviderImp) SendMail(sendMailRequest contracts.SendMailRequest) error {
 	dialer := gomail.NewDialer(internal.MAIL_SMTP, internal.MAIL_PORT, internal.MAIL_FROM, internal.MAIL_PASSWORD)
@@ -30,5 +32,10 @@ func (m *MailProviderImp) SendMail(sendMailRequest contracts.SendMailRequest) er
 		return errors.New("Erro ao enviar o email: " + err.Error())
 	}
 
+	return nil
+}
+
+
+func (m *FakeMailProvider) SendMail(sendMailRequest contracts.SendMailRequest) error {
 	return nil
 }

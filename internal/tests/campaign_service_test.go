@@ -11,9 +11,6 @@ import (
 	"github.com/stretchr/testify/mock"
 )
 
-
-
-
 func Test_Create_Campaign(t *testing.T) {
 	setUp()
 
@@ -221,4 +218,45 @@ func Test_CancelCampaign_RepositoryError(t *testing.T) {
 	err := campaignServiceImp.Cancel("123")
 
 	assert.Equal("erro ao cancelar campanha " + "database error", err.Error())
+}
+
+
+func Test_StartCampaign_NotFoundError(t *testing.T) {
+	setUp()
+
+	assert := assert.New(t)
+
+	campaignRepositoryMock.On("GetById", mock.Anything).Return(&campaign.Campaign{}, errors.New("campanha não encontrada"))
+
+	err := campaignServiceImp.Start("123")
+
+	assert.NotNil(err)
+	assert.Equal("campanha não encontrada", err.Error())
+}
+
+func Test_StartCampaign_CampaignNotPendingError(t *testing.T) {
+	setUp()
+
+	assert := assert.New(t)
+
+	campaignRepositoryMock.On("GetById", mock.Anything).Return(&campaign.Campaign{Status: campaign.SentStatus}, nil)
+
+	err := campaignServiceImp.Start("123")
+
+	assert.NotNil(err)
+	assert.Equal("campanha não pode ser iniciada", err.Error())
+}
+
+
+func Test_StartCampaign_RepositoryError(t *testing.T) {
+	setUp()
+
+	assert := assert.New(t)
+
+	campaignRepositoryMock.On("GetById", mock.Anything).Return(&campaign.Campaign{Status: campaign.PendingStatus}, nil)
+	campaignRepositoryMock.On("Update", mock.Anything).Return(&campaign.Campaign{}, errors.New("database error"))
+
+	err := campaignServiceImp.Start("123")
+
+	assert.Equal("erro ao enviar campanha " + "database error", err.Error())
 }

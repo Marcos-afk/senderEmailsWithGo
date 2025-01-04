@@ -75,3 +75,8 @@ func NewCampaign(name string, content string, createdBy string, emails []string)
 func (c *Campaign) Cancel() {
 	c.Status = CanceledStatus
 }
+
+
+func (c *Campaign) Sent(){
+	c.Status = SentStatus
+}

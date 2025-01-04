@@ -4,6 +4,7 @@ import (
 	"senderEmails/internal/contracts"
 	"senderEmails/internal/domain/campaign"
 	"senderEmails/internal/endpoints"
+	"senderEmails/internal/infrastructure/providers"
 	"senderEmails/internal/tests/mocks"
 
 	"github.com/jaswdr/faker/v2"
@@ -28,6 +29,7 @@ var (
 	}
 	campaignRepositoryMock *mocks.CampaignRepositoryMock
 	campaignServiceMock *mocks.CampaignServiceMock
+	mailProviderMock *providers.FakeMailProvider
 	campaignServiceImp  = &campaign.ServiceImp{}
 	handler = endpoints.Handler{}
 )

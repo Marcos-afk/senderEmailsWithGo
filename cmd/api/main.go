@@ -59,6 +59,7 @@ func main() {
 		Repository: &database.CampaignRepository{
 			Db: db,
 		},
+		MailProvider: &providers.MailProviderImp{},
 	}
 
 	handler := endpoints.Handler{

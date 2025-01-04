@@ -3,6 +3,7 @@ package campaign
 import (
 	"errors"
 	"senderEmails/internal/contracts"
+	"senderEmails/internal/infrastructure/providers"
 	internalerrors "senderEmails/internal/internal-errors"
 )
 
@@ -12,10 +13,12 @@ type Service interface {
 	Create(campaign contracts.CreateCampaign) (*Campaign, error)
 	Cancel(id string) error
 	Delete(id string) error
+	Start(id string) error
 }
 
 type ServiceImp struct {
 	Repository Repository
+	MailProvider providers.MailProvider
 }
 
 func (s *ServiceImp) Create(createCampaign contracts.CreateCampaign) (*Campaign, error) {
@@ -95,6 +98,38 @@ func (s *ServiceImp) Delete(id string) error {
 	deleteErr := s.Repository.Delete(id)
 	if deleteErr != nil {
 		return errors.New("erro ao deletar campanha " + deleteErr.Error())
+	}
+
+	return nil
+}
+
+
+func (s *ServiceImp) Start(id string) error {
+	campaign, foundErr := s.Repository.GetById(id)
+
+	if foundErr != nil {
+		return errors.New("campanha não encontrada")
+	}
+
+	if campaign.Status != PendingStatus {
+		return errors.New("campanha não pode ser iniciada")
+	}
+
+	contacts := make([]string, len(campaign.Contacts))
+	for _, contact := range campaign.Contacts {
+    contacts = append(contacts, contact.Email)
+	}
+
+	s.MailProvider.SendMail(contracts.SendMailRequest{
+		To: contacts,
+		Subject: campaign.Name,
+		Message: campaign.Content,
+	})
+
+	campaign.Sent()
+	_, updateErr := s.Repository.Update(campaign)
+	if updateErr != nil {
+		return errors.New("erro ao enviar campanha " + updateErr.Error())
 	}
 
 	return nil

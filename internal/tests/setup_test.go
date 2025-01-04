@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
+	"senderEmails/internal/infrastructure/providers"
 	"senderEmails/internal/tests/mocks"
 
 	"github.com/go-chi/chi/v5"
@@ -15,7 +16,9 @@ import (
 func setUp(){
 	campaignRepositoryMock = new(mocks.CampaignRepositoryMock)
 	campaignServiceMock = new (mocks.CampaignServiceMock)
+	mailProviderMock  = new (providers.FakeMailProvider)
 	campaignServiceImp.Repository = campaignRepositoryMock
+	campaignServiceImp.MailProvider = mailProviderMock
 	handler.CampaignService = campaignServiceMock
 }
 
