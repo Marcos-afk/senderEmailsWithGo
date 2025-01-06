@@ -76,6 +76,7 @@ func main() {
 			r.Get("/", endpoints.HandlerError(handler.CampaignsGet))
 			r.Get("/{id}", endpoints.HandlerError(handler.CampaignGetById))
 			r.Patch("/{id}/cancel", endpoints.HandlerError(handler.CampaignCancelPatch))
+			r.Patch("/{id}/start", endpoints.HandlerError(handler.CampaignStart))
 			r.Delete("/{id}", endpoints.HandlerError(handler.CampaignDelete))
 		})
 

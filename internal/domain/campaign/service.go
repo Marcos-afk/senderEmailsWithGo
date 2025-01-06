@@ -116,15 +116,19 @@ func (s *ServiceImp) Start(id string) error {
 	}
 
 	contacts := make([]string, len(campaign.Contacts))
-	for _, contact := range campaign.Contacts {
-    contacts = append(contacts, contact.Email)
+	for i, contact := range campaign.Contacts {
+    contacts[i] = contact.Email
 	}
 
-	s.MailProvider.SendMail(contracts.SendMailRequest{
+	sendEmailErr := s.MailProvider.SendMail(contracts.SendMailRequest{
 		To: contacts,
 		Subject: campaign.Name,
 		Message: campaign.Content,
 	})
+
+	if sendEmailErr != nil {
+		return errors.New(sendEmailErr.Error())
+	}
 
 	campaign.Sent()
 	_, updateErr := s.Repository.Update(campaign)

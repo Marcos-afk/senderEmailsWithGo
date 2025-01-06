@@ -34,7 +34,7 @@ func (c *CampaignRepository) Get() []campaign.Campaign {
 func (c *CampaignRepository) GetById(id string) (*campaign.Campaign, error) {
 	var foundCampaign campaign.Campaign
 
-	tx := c.Db.Where("id = ?", id).First(&foundCampaign)
+	tx := c.Db.Preload("Contacts").Where("id = ?", id).First(&foundCampaign)
 	if tx.Error != nil {
 		return &campaign.Campaign{}, errors.New("campanha não encontrada")
 	}
