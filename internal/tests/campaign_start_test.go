@@ -8,21 +8,21 @@ import (
 	"github.com/stretchr/testify/mock"
 )
 
-func Test_CampaignCancelPatch(t *testing.T) {
+func Test_Campaign_Start(t *testing.T) {
 	setUp()
 
 	assert := assert.New(t)
 
-	campaignServiceMock.On("Cancel", mock.Anything).Return(nil)
-	req, rr := newHttpTest("PATCH", "/cancel", nil)
+	campaignServiceMock.On("Start", mock.Anything).Return(nil)
+	req, rr := newHttpTest("PATCH", "/start", nil)
 	req = addParameter(req, "id", "123")
 
-	response, status, err := handler.CampaignCancelPatch(rr, req)
+	response, status, err := handler.CampaignStart(rr, req)
 
 	expectedResponse := struct {
 		Message string `json:"message"`
 	}{
-		Message: "Campanha cancelada com sucesso!",
+		Message: "Campanha iniciada com sucesso!",
 	}
 
 	assert.Nil(err)
