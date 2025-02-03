@@ -14,6 +14,7 @@ const (
 	SentStatus    = "SENT"
 	FailedStatus  = "FAILED"
 	CanceledStatus = "CANCELED"
+	StartedStatus = "STARTED"
 )
 
 
@@ -79,4 +80,13 @@ func (c *Campaign) Cancel() {
 
 func (c *Campaign) Sent(){
 	c.Status = SentStatus
+}
+
+
+func (c *Campaign) Failed(){
+	c.Status = FailedStatus
+}
+
+func (c *Campaign) Started(){
+	c.Status = StartedStatus
 }

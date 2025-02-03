@@ -120,17 +120,24 @@ func (s *ServiceImp) Start(id string) error {
     contacts[i] = contact.Email
 	}
 
-	sendEmailErr := s.MailProvider.SendMail(contracts.SendMailRequest{
-		To: contacts,
-		Subject: campaign.Name,
-		Message: campaign.Content,
-	})
 
-	if sendEmailErr != nil {
-		return errors.New(sendEmailErr.Error())
-	}
+	go func(){
+		sendEmailErr := s.MailProvider.SendMail(contracts.SendMailRequest{
+			To: contacts,
+			Subject: campaign.Name,
+			Message: campaign.Content,
+		})
+	
+		if sendEmailErr != nil {
+				campaign.Failed()
+		}	else{ 
+				campaign.Sent()
+		}
 
-	campaign.Sent()
+		s.Repository.Update(campaign)
+	}()
+		
+	campaign.Started()
 	_, updateErr := s.Repository.Update(campaign)
 	if updateErr != nil {
 		return errors.New("erro ao enviar campanha " + updateErr.Error())
