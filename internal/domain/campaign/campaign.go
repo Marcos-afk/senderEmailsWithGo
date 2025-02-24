@@ -34,6 +34,7 @@ type Campaign struct {
 	Status 		string     `json:"status" validate:"required"`
 	UserId    string     `json:"user_id" validate:"required"`
 	CreatedAt time.Time `json:"created_at" validate:"required"`
+	UpdatedAt time.Time `json:"updated_at"`
 }
 
 
@@ -75,18 +76,22 @@ func NewCampaign(name string, content string, createdBy string, emails []string)
 
 func (c *Campaign) Cancel() {
 	c.Status = CanceledStatus
+	c.UpdatedAt = time.Now()
 }
 
 
 func (c *Campaign) Sent(){
 	c.Status = SentStatus
+	c.UpdatedAt = time.Now()
 }
 
 
 func (c *Campaign) Failed(){
 	c.Status = FailedStatus
+	c.UpdatedAt = time.Now()
 }
 
 func (c *Campaign) Started(){
 	c.Status = StartedStatus
+	c.UpdatedAt = time.Now()
 }
