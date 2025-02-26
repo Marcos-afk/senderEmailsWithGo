@@ -1,8 +1,11 @@
 package main
 
 import (
-	"fmt"
+	"log"
+	"senderEmails/internal/domain/campaign"
 	"senderEmails/internal/infrastructure/database"
+	"senderEmails/internal/infrastructure/providers"
+	"time"
 )
 
 func main() {
@@ -12,7 +15,27 @@ func main() {
 		Db: db,
 	}
 
-	campaigns := campaignsRepository.Get()
+	campaignService := campaign.ServiceImp{
+		Repository: &database.CampaignRepository{
+			Db: db,
+		},
+		MailProvider: &providers.MailProviderImp{},
+	}
 
-	fmt.Println(campaigns)
+	for {
+		campaigns := campaignsRepository.GetCampaignsToBeSent()
+	
+		for _, campaign := range campaigns {
+			success, error := campaignService.SendMailAndUpdateStatus(&campaign); if error != nil {
+				log.Println(error)
+			}
+
+			if success {
+				log.Println("Email's da campanha '" + campaign.Name + "' enviados com sucesso")
+			}
+		}
+
+		time.Sleep(20 * time.Minute)
+	}
+
 }

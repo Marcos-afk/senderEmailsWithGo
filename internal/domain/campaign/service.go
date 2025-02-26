@@ -14,6 +14,7 @@ type Service interface {
 	Cancel(id string) error
 	Delete(id string) error
 	Start(id string) error
+	SendMailAndUpdateStatus(SendMailToCampaign *Campaign) (bool, error)
 }
 
 type ServiceImp struct {
@@ -103,6 +104,31 @@ func (s *ServiceImp) Delete(id string) error {
 	return nil
 }
 
+func (s *ServiceImp) SendMailAndUpdateStatus(SendMailToCampaign *Campaign) (bool, error) {
+	contacts := make([]string, len(SendMailToCampaign.Contacts))
+	for i, contact := range SendMailToCampaign.Contacts {
+    contacts[i] = contact.Email
+	}
+
+	sendEmailErr := s.MailProvider.SendMail(contracts.SendMailRequest{
+		To: contacts,
+		Subject: SendMailToCampaign.Name,
+		Message: SendMailToCampaign.Content,
+	})
+		
+	if sendEmailErr != nil {
+			SendMailToCampaign.Failed()
+	}	else{ 
+			SendMailToCampaign.Sent()
+	}
+
+  _, updateErr:=	s.Repository.Update(SendMailToCampaign)
+	if updateErr != nil {
+		return false, errors.New("erro ao enviar campanha " + updateErr.Error())
+	}
+
+	return sendEmailErr == nil, nil
+}
 
 func (s *ServiceImp) Start(id string) error {
 	campaign, foundErr := s.Repository.GetById(id)
@@ -115,33 +141,14 @@ func (s *ServiceImp) Start(id string) error {
 		return errors.New("campanha não pode ser iniciada")
 	}
 
-	contacts := make([]string, len(campaign.Contacts))
-	for i, contact := range campaign.Contacts {
-    contacts[i] = contact.Email
-	}
-
-
-	go func(){
-		sendEmailErr := s.MailProvider.SendMail(contracts.SendMailRequest{
-			To: contacts,
-			Subject: campaign.Name,
-			Message: campaign.Content,
-		})
-	
-		if sendEmailErr != nil {
-				campaign.Failed()
-		}	else{ 
-				campaign.Sent()
-		}
-
-		s.Repository.Update(campaign)
-	}()
-		
 	campaign.Started()
+
 	_, updateErr := s.Repository.Update(campaign)
 	if updateErr != nil {
 		return errors.New("erro ao enviar campanha " + updateErr.Error())
 	}
 
+	go s.SendMailAndUpdateStatus(campaign)
+	
 	return nil
 }

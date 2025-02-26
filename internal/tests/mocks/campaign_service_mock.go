@@ -42,3 +42,9 @@ func (c *CampaignServiceMock) Start(id string) error {
 	args := c.Called(id)
 	return args.Error(0)
 }
+
+
+func (c *CampaignServiceMock) SendMailAndUpdateStatus(SendMailToCampaign *campaign.Campaign)(bool, error) {
+	args := c.Called(SendMailToCampaign)
+	return args.Get(0).(bool), args.Error(1)
+}

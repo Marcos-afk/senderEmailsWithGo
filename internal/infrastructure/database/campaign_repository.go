@@ -68,3 +68,15 @@ func (c *CampaignRepository) Delete(id string) error {
 
 	return tx.Commit().Error
 }
+
+
+func (c *CampaignRepository) GetCampaignsToBeSent() []campaign.Campaign {
+	var campaigns []campaign.Campaign
+
+	c.Db.Preload("Contacts").
+		Where("status = ? and date_part('minute', now()::timestamp - updated_at::timestamp) >= ? ",
+		campaign.StartedStatus, 5).
+	 	Find(&campaigns)
+
+	return campaigns
+}
