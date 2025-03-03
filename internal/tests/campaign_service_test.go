@@ -260,3 +260,36 @@ func Test_StartCampaign_RepositoryError(t *testing.T) {
 
 	assert.Equal("erro ao enviar campanha " + "database error", err.Error())
 }
+
+
+func Test_SendMailAndUpdateStatus(t *testing.T){
+	setUp()
+
+	assert := assert.New(t)
+
+	campaignRepositoryMock.On("Update", mock.Anything).Return(&campaign.Campaign{}, nil)
+
+	success,err := campaignServiceImp.SendMailAndUpdateStatus(&campaign.Campaign{
+		Status:  campaign.PendingStatus,
+	})
+
+	assert.Nil(err)
+	assert.True(success)
+}
+
+
+func Test_SendMailAndUpdateStatus_CampaignError(t *testing.T){
+	setUp()
+
+	assert := assert.New(t)
+
+	campaignRepositoryMock.On("Update", mock.Anything).Return(&campaign.Campaign{}, errors.New("database error"))
+
+	_, err := campaignServiceImp.SendMailAndUpdateStatus(&campaign.Campaign{
+		Status:  campaign.PendingStatus,
+	})
+
+	assert.NotNil(err)
+	assert.Equal("erro ao enviar campanha " + "database error", err.Error())
+
+}
