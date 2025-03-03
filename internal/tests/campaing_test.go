@@ -67,3 +67,49 @@ func Test_NewCampaign_ContactsNotEmpty(t *testing.T){
 
 	assert.Equal("contacts is required with min 1", err.Error())
 }
+
+
+func Test_Campaign_CancelStatus(t *testing.T){
+	assert := assert.New(t)
+
+	createdCampaign, _ := campaign.NewCampaign(name, content, createdBy, contacts)
+
+	createdCampaign.Cancel()
+
+	assert.Equal(campaign.CanceledStatus, createdCampaign.Status)
+	assert.NotNil(createdCampaign.UpdatedAt)
+}
+
+
+func Test_Campaign_SentStatus(t *testing.T){
+	assert := assert.New(t)
+
+	createdCampaign, _ := campaign.NewCampaign(name, content, createdBy, contacts)
+
+	createdCampaign.Sent()
+
+	assert.Equal(campaign.SentStatus, createdCampaign.Status)
+	assert.NotNil(createdCampaign.UpdatedAt)
+}
+
+func Test_Campaign_FailedStatus(t *testing.T){
+	assert := assert.New(t)
+
+	createdCampaign, _ := campaign.NewCampaign(name, content, createdBy, contacts)
+
+	createdCampaign.Failed()
+
+	assert.Equal(campaign.FailedStatus, createdCampaign.Status)
+	assert.NotNil(createdCampaign.UpdatedAt)
+}
+
+func Test_Campaign_StartedStatus(t *testing.T){
+	assert := assert.New(t)
+
+	createdCampaign, _ := campaign.NewCampaign(name, content, createdBy, contacts)
+
+	createdCampaign.Started()
+
+	assert.Equal(campaign.StartedStatus, createdCampaign.Status)
+	assert.NotNil(createdCampaign.UpdatedAt)	
+}
