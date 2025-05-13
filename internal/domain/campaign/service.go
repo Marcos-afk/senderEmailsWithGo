@@ -148,6 +148,7 @@ func (s *ServiceImp) Start(id string) error {
 		return errors.New("erro ao enviar campanha " + updateErr.Error())
 	}
 
+
 	go s.SendMailAndUpdateStatus(campaign)
 	
 	return nil
